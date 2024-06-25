@@ -1,0 +1,35 @@
+table {width:100%;border-collapse:collapse;}
+td {border:1px solid #ccf;text-align:left;color:#888;font-size:12px;height:25px;vertical-align:top;cursor:pointer;}
+td:hover {background-color:#ffc;}
+th {border:1px solid #ccf;text-align:center;background-color:#eef;width:14.3%;font-size:14px;}
+td a {margin-left:8px;font-size:14px;color:#000;}
+#atgadne_dialogs {
+	position:absolute;	
+	background-color:rgba(235, 235, 255, 0.8);
+	width:450px;
+	padding:10px;
+	margin-left:30%;
+	top:10%;
+	z-index:3;
+	text-align:center;
+}
+#atg_teksts {resize:none;margin:7px;}
+#tagad {
+	color:#444;
+	font-size:11px;
+	font-family:Verdana;
+	width:30%;
+	float:left;
+	height:22px;
+	all:bottom;
+}
+#atgadina {
+	background-color:#c00;
+	color:#fff;
+	font-size:16px;
+	font-weight:bold;
+	width:50%;
+	float:left;
+	text-align:center;
+	padding:0px 8px 0px 8px;
+}

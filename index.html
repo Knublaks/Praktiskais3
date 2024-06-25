@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>ToDo</title>
+	<link rel="stylesheet" href="stils.css">
+</head>
+<body>
+<div id='atgadne_dialogs' hidden>
+	<b id='kad'>Jauna atgādne</b> (150 zīmes maks.)
+	<textarea id="atg_teksts" rows="4" cols="50" maxlength="150"></textarea><br>
+	<button onclick='ievadit()'>Saglabāt</button>
+	<button onclick='dzest_txt()'>Dzēst tekstu</button>
+	<button onclick='atcelt()'>Atcelt</button>
+</div>
+<div id='tagad'> - - - </div>
+<div id='atgadina' hidden></div>  
+<table id='tabula'></table>
+
+<script>
+const dienas = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+const menesi = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+var datumi=[];
+var TAGAD=document.getElementById('tagad');
+var ATGADINA=document.getElementById('atgadina');
+var TB=document.getElementById('tabula');
+var ATGDLG=document.getElementById('atgadne_dialogs');
+var ATGTXT=document.getElementById('atg_teksts');
+var atg_id='';
+var dati=[];
+// aizpilda masīvu
+for(i=0;i<7;i++) {
+	dati.push([]);
+}
+for(i=0;i<7;i++) {	
+    for(j=0;j<24;j++)  {
+        dati[i].push('');
+    }
+}
+
+pulkstenis();
+datumi_dienam();
+setInterval(pulkstenis, 10000);
+var TRH=document.createElement('tr');
+TB.appendChild(TRH);
+for(h=-1;h<24;h++) {
+	var TR=document.createElement('tr');
+	TB.appendChild(TR);
+	for(d=0;d<dienas.length;d++) {
+		if(h==-1) {
+			var TH=document.createElement('th');
+			TH.innerText=dienas[d]+' ('+datumi[d]+')';
+			TRH.appendChild(TH);
+		} else {
+			var TD=document.createElement('td');
+			TD.setAttribute('class','kolona');
+			TR.appendChild(TD);
+			TD.innerText=('0'+h).slice(-2)+':00';
+			TD.setAttribute('id','dt_'+d+'_'+h);
+			TD.setAttribute('name','dtn');
+			TD.setAttribute('onclick','jauna_atgadne(this,'+d+','+h+')');
+			var AA=document.createElement('a');
+			AA.setAttribute('id','dta_'+d+'_'+h);
+			TD.appendChild(AA);
+			AA.innerText='';
+		}
+	}	
+}
+setTimeout(function() {atjauno_datus()}, 900);
+function jauna_atgadne(el,d,h) {
+	atg_id=el.id;
+	ATGDLG.style.display='block';
+	ATGTXT.value=document.getElementById(atg_id).children[0].innerText;
+	document.getElementById('kad').innerText=dienas[d]+' from '+h+':00';
+}
+function ievadit() {
+	var teksts=ATGTXT.value;
+	document.getElementById(atg_id).children[0].innerText=teksts;
+	ATGDLG.style.display='none';
+	ATGTXT.value='';
+	saglaba_datus();
+}
+function dzest_txt() {
+	ATGTXT.value='';
+}
+function atcelt() {
+	ATGDLG.style.display='none';
+	ATGTXT.value='';
+}
+function datumi_dienam() {
+	var dnms=86400000; // ms dienā
+	var ddd = new Date();
+	var ddd0=ddd*1; // atrod timestamp ms
+	var dn=ddd.getDay();
+	var dt=ddd.getDate();
+	var mn=ddd.getMonth();
+	for(i=0;i<7;i++) {
+		// nosaka nedēļas datumu piemērojot esošo nedēļas dienu
+		var dddi=new Date(ddd0+(dnms*(i-dn))); 		
+		datumi[i]=dddi.getDate()+'.'+menesi[dddi.getMonth()];
+	}	
+}
+
+function pulkstenis() {
+	var ddd = new Date();
+	TAGAD.innerText=datums(ddd)+' '+laiks(ddd);
+	setTimeout(function() {iekraso(ddd.getDay(),ddd.getHours())}, 1100);
+}
+function iekraso(dienu,stundu) {
+	var DTN=document.getElementsByName('dtn');
+	for(n=0;n<DTN.length;n++) {
+		DTN[n].style='background-color:none';
+	}
+	var stundas_logs=document.getElementById('dt_'+dienu+'_'+stundu);
+	stundas_logs.style='background-color:#dfd';
+	ATGADINA.innerText=stundas_logs.children[0].innerText;
+	if(stundas_logs.children[0].innerText=='') {
+		ATGADINA.style.display='none';
+	} else {
+		ATGADINA.style.display='block';
+	}
+}
+function laiks(ttt) {
+	return ('0'+ttt.getHours()).slice(-2)+':'+('0'+ttt.getMinutes()).slice(-2)+':'+('0'+ttt.getSeconds()).slice(-2);
+}
+function datums(ddd) {
+	return ddd.getFullYear()+'/'+('0'+(ddd.getMonth()+1)).slice(-2)+'/'+('0'+ddd.getDate()).slice(-2);
+}	
+
+function saglaba_datus() {
+	// lasa tabulu
+	for(i=0;i<7;i++) {
+		for(j=0;j<24;j++) {
+			dati[i][j]=document.getElementById('dta_'+i+'_'+j).innerText;
+		}
+	}
+	// Saglabā datus localStorage json formātā
+	localStorage.setItem('atgadnesDati', JSON.stringify(dati));
+}
+function atjauno_datus() {
+	// izsauc no localStorage
+	var dati0=localStorage.getItem('atgadnesDati');
+	//alert(dati0);
+	var dati1=JSON.parse(dati0); // pārveido par js masīvu
+	for(i=0;i<7;i++) {
+		for(j=0;j<24;j++) {
+			document.getElementById('dta_'+i+'_'+j).innerText=dati1[i][j];
+		}
+	}
+}
+
+</script>
+</body>
+</html>
